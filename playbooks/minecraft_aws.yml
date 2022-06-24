@@ -110,20 +110,3 @@
         state: restarted
         name: minecraft
       when: mc_started.changed or mc_update
-
-    - name: backup script
-      copy:
-        src: backup.sh
-        dest: /usr/local/bin/minecraft_backup
-        mode: '0500'
-        owner: minecraft
-        group: minecraft
-
-    - name: backup cron - every 3rd hour (8 times daily)
-      cron:
-        name: "minecraft backup"
-        minute: "0"
-        hour: "*/3"
-        state: present
-        user: minecraft
-        job: /usr/local/bin/minecraft_backup
