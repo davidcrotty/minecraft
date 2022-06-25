@@ -15,7 +15,7 @@ provider "aws" {
 
 resource "aws_instance" "instance" {
   ami                         = "ami-0fb391cce7a602d1f"
-  instance_type               = "t2.micro"
+  instance_type               = "m5.large"
   associate_public_ip_address = true
   key_name                    = "ssh-key"
 
@@ -34,7 +34,7 @@ resource "aws_instance" "instance" {
       "sudo apt update",
       "sudo apt install ansible git -y",
       "git clone https://github.com/davidcrotty/minecraft.git /tmp/minecraft",
-      "ansible-playbook /tmp/minecraft/playbooks/minecraft_aws.yml --extra-vars \"target=localhost mc_memory=1024\""
+      "ansible-playbook /tmp/minecraft/playbooks/minecraft_aws.yml --extra-vars \"target=localhost mc_memory=7168\""
     ]
   }
 
