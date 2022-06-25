@@ -31,8 +31,8 @@ resource "aws_instance" "instance" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sudo apt update",
-      "sudo apt install ansible git -y",
+      "sudo apt-get update",
+      "sudo apt-get install ansible git -y",
       "git clone https://github.com/davidcrotty/minecraft.git /tmp/minecraft",
       "ansible-playbook /tmp/minecraft/playbooks/minecraft_aws.yml --extra-vars \"target=localhost mc_memory=7168\""
     ]
