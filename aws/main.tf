@@ -29,12 +29,16 @@ resource "aws_instance" "instance" {
     private_key = file("/Users/davidcrotty/.ssh/minecraft.pem")
     host        = self.public_ip
   }
+
+  provisioner "file" {
+    source      = "./scripts/install_ansible.sh"
+    destination = "/tmp/install_ansible.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get update",
-      "sudo apt-get install ansible git -y",
-      "git clone https://github.com/davidcrotty/minecraft.git /tmp/minecraft",
-      "ansible-playbook /tmp/minecraft/playbooks/minecraft_aws.yml --extra-vars \"target=localhost mc_memory=7168\""
+      "chmod +x /tmp/install_ansible.sh",
+      "sudo /tmp/install_ansible.sh",
     ]
   }
 
