@@ -55,14 +55,15 @@
     - name: run jar when eula not exists (max 60 seconds)
       shell:
         chdir: /opt/minecraft/server/
-        cmd: timeout 60 java -Xmx1024M -Xms1024M -jar server.jar nogui
+        cmd: timeout 60 java -Xmx{{ mc_memory }}M -Xms{{ mc_memory }}M -jar server.jar nogui
       ignore_errors: yes
       when: mc_eula_file.stat.exists == False
 
     - name: agree to eula
-      lineinfile:
+      replace:
         path: /opt/minecraft/server/eula.txt
-        line: 'eula=true'
+        regexp: '(eula=false)' 
+        replace: 'eula=true'
         mode: '0444'
         owner: minecraft
         group: minecraft
