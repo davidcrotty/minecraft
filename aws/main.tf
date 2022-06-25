@@ -25,8 +25,8 @@ resource "aws_instance" "instance" {
 
   connection {
     type        = "ssh"
-    user        = "ec2-user"
-    private_key = file("rajesh.pem")
+    user        = "ubuntu"
+    private_key = file("/Users/davidcrotty/.ssh/minecraft.pem")
     host        = self.public_ip
   }
   provisioner "remote-exec" {
