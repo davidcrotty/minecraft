@@ -7,7 +7,7 @@
 
     - name: java
       package:
-        name: "{% if ansible_os_family == 'RedHat' %}java-1.8.0-openjdk-headless{% elif ansible_os_family == 'Debian' %}openjdk-8-jdk{% endif %}"
+        name: "openjdk-17-jdk"
         state: present
 
     - name: minecraft user
