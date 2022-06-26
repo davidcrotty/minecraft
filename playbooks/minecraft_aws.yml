@@ -33,6 +33,10 @@
         - /opt/minecraft/server
         - /opt/minecraft/tmp
 
+    - name: check for existing backups and restore
+      shell: fetch_latest_aws_backup.sh
+      ignore_errors: yes
+
     - name: determine if jar downloaded
       stat:
         path: /opt/minecraft/server/server.jar
