@@ -34,7 +34,7 @@
         - /opt/minecraft/tmp
 
     - name: check for existing backups and restore
-      shell: fetch_latest_aws_backup.sh
+      script: /tmp/minecraft/playbooks/fetch_latest_aws_backup.sh
       ignore_errors: yes
 
     - name: determine if jar downloaded
@@ -118,7 +118,7 @@
     - name: automate backups
       ansible.builtin.cron:
         name: "backup server"
-        minute: "/30"
+        minute: "*/30"
         user: root
         job: "sh /opt/minecraft/backup.sh >> /var/log/minecraft_backup.log 2>&1"
           
