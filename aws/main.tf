@@ -13,35 +13,59 @@ provider "aws" {
   region = "eu-west-2"
 }
 
-resource "aws_s3_bucket" "minecraft_backup" {
-  bucket = "minecraft-backup-6883d30d-56e2-480d-9e47-6ec8b5446725"
-  tags = {
-    "project" = "minecraft"
-  }
+resource "aws_iam_role" "web_iam_role" {
+  name               = "web_iam_role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
 }
 
-resource "aws_iam_role" "minecraft_backup_role" {
-  name               = "minecraft_save_access"
-  assume_role_policy = aws_iam_role_policy.policy
+resource "aws_iam_instance_profile" "web_instance_profile" {
+  name  = "web_instance_profile"
+  role = "web_iam_role"
 }
 
-resource "aws_iam_role_policy" "policy" {
-  name   = "policy"
-  policy = data.aws_iam_policy_document.minecraft_backup_policy.json
+resource "aws_iam_role_policy" "web_iam_role_policy" {
+  name   = "web_iam_role_policy"
+  role   = aws_iam_role.web_iam_role.id
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": ["arn:aws:s3:::bucket-name"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": ["arn:aws:s3:::bucket-name/*"]
+    }
+  ]
+}
+EOF
 }
 
-data "aws_iam_policy_document" "minecraft_backup_policy" {
-  statement {
-    sid       = "VisualEditor0"
-    effect    = "Allow"
-    resources = ["*"]
-    actions   = ["ec2:*"]
-  }
-}
-
-resource "aws_iam_instance_profile" "minecraft_profile" {
-  name = "minecraft_profile"
-  role = aws_iam_role.minecraft_backup_role.name
+resource "aws_s3_bucket" "apps_bucket" {
+  bucket = "bucket-name"
+  acl    = "private"
 }
 
 resource "aws_instance" "instance" {
@@ -49,7 +73,7 @@ resource "aws_instance" "instance" {
   instance_type               = "m5.large"
   associate_public_ip_address = true
   key_name                    = "ssh-key"
-  iam_instance_profile        = aws_iam_instance_profile.minecraft_profile.name
+  iam_instance_profile        = aws_iam_instance_profile.web_instance_profile.id
 
   tags = {
     Name = "Minecraft"

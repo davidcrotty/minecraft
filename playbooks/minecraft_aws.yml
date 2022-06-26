@@ -5,6 +5,11 @@
   become_user: root
   tasks:
 
+    - name: aws
+      package:
+        name: "awscli"
+        state: present
+
     - name: java
       package:
         name: "openjdk-17-jdk"
