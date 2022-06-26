@@ -48,7 +48,7 @@ resource "aws_iam_role_policy" "web_iam_role_policy" {
             "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": "s3:ListBucket",
-            "Resource": "arn:aws:s3:::bucket-name"
+            "Resource": "arn:aws:s3:::minecraft-backups-ea33578e-183a-4888-8716-8c001c7144c9"
         },
         {
             "Sid": "VisualEditor1",
@@ -58,7 +58,7 @@ resource "aws_iam_role_policy" "web_iam_role_policy" {
                 "s3:GetObject",
                 "s3:DeleteObject"
             ],
-            "Resource": "arn:aws:s3:::bucket-name/*"
+            "Resource": "arn:aws:s3:::minecraft-backups-ea33578e-183a-4888-8716-8c001c7144c9/*"
         },
         {
             "Sid": "VisualEditor2",
