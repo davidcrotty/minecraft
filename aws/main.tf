@@ -42,29 +42,48 @@ resource "aws_iam_role_policy" "web_iam_role_policy" {
   role   = aws_iam_role.web_iam_role.id
   policy = <<EOF
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": ["s3:ListBucket"],
-      "Resource": ["arn:aws:s3:::bucket-name"]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:PutObject",
-        "s3:GetObject",
-        "s3:DeleteObject"
-      ],
-      "Resource": ["arn:aws:s3:::bucket-name/*"]
-    }
-  ]
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::bucket-name"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::bucket-name/*"
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListStorageLensConfigurations",
+                "s3:ListAccessPointsForObjectLambda",
+                "s3:ListBucketMultipartUploads",
+                "s3:ListAllMyBuckets",
+                "s3:ListAccessPoints",
+                "s3:ListJobs",
+                "s3:ListBucketVersions",
+                "s3:ListBucket",
+                "s3:ListMultiRegionAccessPoints",
+                "s3:ListMultipartUploadParts"
+            ],
+            "Resource": "*"
+        }
+    ]
 }
 EOF
 }
 
 resource "aws_s3_bucket" "apps_bucket" {
-  bucket = "bucket-name"
+  bucket = "minecraft-backups-ea33578e-183a-4888-8716-8c001c7144c9"
   acl    = "private"
 }
 
