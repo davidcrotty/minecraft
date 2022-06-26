@@ -91,7 +91,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "example" {
   bucket = aws_s3_bucket.apps_bucket.id
 
   rule {
-    id = "expire_after_7_days"
+    id     = "expire_after_7_days"
     status = "Enabled"
 
     # ... other transition/expiration actions ...
@@ -102,11 +102,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "example" {
   }
 }
 
-resource "aws_instance" "instance" {
+resource "aws_spot_instance_request" "instance" {
   ami                         = "ami-0fb391cce7a602d1f"
   instance_type               = "m5.large"
   associate_public_ip_address = true
   key_name                    = "ssh-key"
+  spot_price                  = "0.04"
+  wait_for_fulfillment        = true
   iam_instance_profile        = aws_iam_instance_profile.web_instance_profile.id
 
   tags = {
@@ -136,7 +138,7 @@ resource "aws_instance" "instance" {
 
 output "instance_ip" {
   description = "The public ip for ssh access"
-  value       = aws_instance.instance.public_ip
+  value       = aws_spot_instance_request.instance.public_ip
 }
 
 resource "aws_key_pair" "ssh-key" {
