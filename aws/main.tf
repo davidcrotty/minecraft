@@ -33,7 +33,7 @@ EOF
 }
 
 resource "aws_iam_instance_profile" "web_instance_profile" {
-  name  = "web_instance_profile"
+  name = "web_instance_profile"
   role = "web_iam_role"
 }
 
@@ -85,6 +85,21 @@ EOF
 resource "aws_s3_bucket" "apps_bucket" {
   bucket = "minecraft-backups-ea33578e-183a-4888-8716-8c001c7144c9"
   acl    = "private"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "example" {
+  bucket = aws_s3_bucket.apps_bucket.id
+
+  rule {
+    id = "expire_after_7_days"
+    status = "Enabled"
+
+    # ... other transition/expiration actions ...
+
+    expiration {
+      days = 7
+    }
+  }
 }
 
 resource "aws_instance" "instance" {
