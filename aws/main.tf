@@ -13,11 +13,43 @@ provider "aws" {
   region = "eu-west-2"
 }
 
+resource "aws_s3_bucket" "minecraft_backup" {
+  bucket = "minecraft-backup-6883d30d-56e2-480d-9e47-6ec8b5446725"
+  tags = {
+    "project" = "minecraft"
+  }
+}
+
+resource "aws_iam_role" "minecraft_backup_role" {
+  name               = "minecraft_save_access"
+  assume_role_policy = aws_iam_role_policy.policy
+}
+
+resource "aws_iam_role_policy" "policy" {
+  name   = "policy"
+  policy = data.aws_iam_policy_document.minecraft_backup_policy.json
+}
+
+data "aws_iam_policy_document" "minecraft_backup_policy" {
+  statement {
+    sid       = "VisualEditor0"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["ec2:*"]
+  }
+}
+
+resource "aws_iam_instance_profile" "minecraft_profile" {
+  name = "minecraft_profile"
+  role = aws_iam_role.minecraft_backup_role.name
+}
+
 resource "aws_instance" "instance" {
   ami                         = "ami-0fb391cce7a602d1f"
   instance_type               = "m5.large"
   associate_public_ip_address = true
   key_name                    = "ssh-key"
+  iam_instance_profile        = aws_iam_instance_profile.minecraft_profile.name
 
   tags = {
     Name = "Minecraft"
