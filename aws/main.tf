@@ -118,7 +118,7 @@ resource "aws_spot_instance_request" "instance" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file("/Users/davidcrotty/.ssh/minecraft.pem")
+    private_key = file(var.privatekeyLocation)
     host        = self.public_ip
   }
 
@@ -143,7 +143,7 @@ output "instance_ip" {
 
 resource "aws_key_pair" "ssh-key" {
   key_name   = "ssh-key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCUtVGOFAS2NuRC6YA95U0LlfrvbXYzNfqDEUd0SGfMK/GBCUDoWYUseiiwNUl/7BRErkAwruJVJbsp6QdCERps5qvX/EOqSv28GHDfYlG5bz8EdbF2TkILhiVNaoqOaXOCbWyZCYehCLXW2XgdVqI/SxgSqlegBfab7gm03VszKKQjpWlFYYlxNTHuk2FsEhykvdbmBfDANXlfS+ivNArEG2jRucme0DbdpsTX0+CJWQ3KMtPgHsemY+4VhFMLVfarAp4Fx9tWoW9mVXH6aG/9kJHYKVHnwynTNzrrmGatn/iFqAQQtjrYNPgq5N0p1So8TuhWOZN6pQSYzHO4dXVN"
+  public_key = var.publickey
 }
 
 # TODO factor in security group creation for ssh
