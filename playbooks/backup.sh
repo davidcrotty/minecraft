@@ -11,7 +11,7 @@ echo "Backup up to aws"
 
 aws s3 cp $BACKUP_DIR$BACKUP_NAME s3://minecraft-backups-ea33578e-183a-4888-8716-8c001c7144c9
 
-TO_REMOVE="$BACKUP_DIR/$BACKUP_NAME.tar.gz"
+TO_REMOVE="$BACKUP_DIR/$BACKUP_NAME"
 
 echo "removing file $TO_REMOVE"
 
