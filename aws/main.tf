@@ -44,6 +44,19 @@ resource "aws_iam_role_policy" "web_iam_role_policy" {
 {
     "Version": "2012-10-17",
     "Statement": [
+      {
+            "Sid": "CloudWatchLogAgentPutForWebServerLogGroup",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:eu-west-2:807845893567:log-group:minecraft",
+                "arn:aws:logs:eu-west-2:807845893567:log-group:minecraft:*:*"
+            ]
+        },
         {
             "Sid": "VisualEditor0",
             "Effect": "Allow",
