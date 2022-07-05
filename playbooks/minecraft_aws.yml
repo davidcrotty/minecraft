@@ -5,10 +5,21 @@
   become_user: root
   tasks:
 
-    - name: aws
+    - name: aws S3
       package:
         name: "awscli"
         state: present
+
+    - name: Install aws cloudwatch agent
+      ansible.builtin.apt:
+        deb: https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
+
+    - name: Add cloudwatch agent to admin group for log visibility
+      ansible.builtin.user:
+        name: cwagent
+        shell: /bin/bash
+        groups: adm
+        append: yes
 
     - name: java
       package:
