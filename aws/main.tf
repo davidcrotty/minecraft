@@ -112,7 +112,7 @@ resource "aws_spot_instance_request" "instance" {
   iam_instance_profile        = aws_iam_instance_profile.web_instance_profile.id
 
   tags = {
-    Name = "Minecraft"
+    Name = "minecraft"
   }
 
   connection {
