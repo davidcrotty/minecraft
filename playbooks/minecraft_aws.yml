@@ -112,6 +112,14 @@
         owner: cwagent
         group: adm
 
+    - name: start/enable aws cloud agent
+      systemd:
+        state: started
+        enabled: yes
+        daemon_reload: yes
+        name: amazon-cloudwatch-agent
+      register: aws_cw_started
+
     - name: start/enable minecraft service
       systemd:
         state: started

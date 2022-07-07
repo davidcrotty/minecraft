@@ -58,17 +58,6 @@ resource "aws_iam_role_policy" "web_iam_role_policy" {
             ]
         },
         {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Sid": "CloudWatchPutMetricData",
-              "Effect": "Allow",
-              "Action": "cloudwatch:PutMetricData",
-              "Resource": "*"
-            }
-          ]
-        },
-        {
             "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": "s3:ListBucket",
