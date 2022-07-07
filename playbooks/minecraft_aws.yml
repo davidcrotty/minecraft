@@ -104,6 +104,14 @@
         owner: minecraft
         group: minecraft
 
+    - name: set aws cloudwatch agent config
+      template:
+        src: amazon-cloudwatch-agent.json
+        dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+        mode: '0600'
+        owner: cwagent
+        group: adm
+
     - name: start/enable minecraft service
       systemd:
         state: started
