@@ -44,6 +44,17 @@
         - /opt/minecraft/server
         - /opt/minecraft/tmp
 
+    - name: minecraft log dirs
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0700'
+        owner: minecraft
+        group: minecraft
+      with_items:
+        - /var/log/minecraft/stdout.log
+        - /var/log/minecraft/errors.log
+
     - name: check for existing backups and restore
       script: /tmp/minecraft/playbooks/fetch_latest_aws_backup.sh
       ignore_errors: yes
