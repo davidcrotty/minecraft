@@ -45,8 +45,19 @@
         - /opt/minecraft/tmp
         - /var/log/minecraft
 
+    - name: minecraft log dirs
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0744'
+        owner: minecraft
+        group: minecraft
+      with_items:
+        - /var/log/minecraft
+
     - name: Create log stdout file
       ansible.builtin.file:
+        mode: '0744' 
         path: "/var/log/minecraft/stdout.log"
         state: touch
         owner: minecraft
@@ -54,6 +65,7 @@
 
     - name: Create log stderr file
       ansible.builtin.file:
+        mode: '0744'
         path: "/var/log/minecraft/errors.log"
         state: touch
         owner: minecraft
@@ -127,6 +139,14 @@
         owner: cwagent
         group: adm
 
+    - name: start/enable aws cloud agent
+      systemd:
+        state: started
+        enabled: yes
+        daemon_reload: yes
+        name: amazon-cloudwatch-agent
+      register: aws_cw_started
+
     - name: start/enable minecraft service
       systemd:
         state: started
@@ -155,12 +175,4 @@
         minute: "*/30"
         user: root
         job: "sh /opt/minecraft/backup.sh >> /var/log/minecraft_backup.log 2>&1"
-
-    - name: start/enable aws cloud agent
-      systemd:
-        state: started
-        enabled: yes
-        daemon_reload: yes
-        name: amazon-cloudwatch-agent
-      register: aws_cw_started
           
