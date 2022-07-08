@@ -5,4 +5,8 @@ resource "aws_cloudwatch_log_group" "minecraft" {
   tags = {
       Name = "minecraft"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }

@@ -127,14 +127,6 @@
         owner: cwagent
         group: adm
 
-    - name: start/enable aws cloud agent
-      systemd:
-        state: started
-        enabled: yes
-        daemon_reload: yes
-        name: amazon-cloudwatch-agent
-      register: aws_cw_started
-
     - name: start/enable minecraft service
       systemd:
         state: started
@@ -163,4 +155,12 @@
         minute: "*/30"
         user: root
         job: "sh /opt/minecraft/backup.sh >> /var/log/minecraft_backup.log 2>&1"
+
+    - name: start/enable aws cloud agent
+      systemd:
+        state: started
+        enabled: yes
+        daemon_reload: yes
+        name: amazon-cloudwatch-agent
+      register: aws_cw_started
           
