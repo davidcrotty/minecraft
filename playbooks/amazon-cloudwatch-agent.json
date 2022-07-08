@@ -26,6 +26,13 @@
 					"log_stream_name": "syslog",
 					"timestamp_format": "%b %d %H:%M:%S",
 					"timezone": "UTC"
+				},
+				{
+					"file_path": "/var/log/minecraft_backup.log",
+					"log_group_name": "minecraft",
+					"log_stream_name": "minecraft_backup",
+					"timestamp_format": "%b %d %H:%M:%S",
+					"timezone": "UTC"
 				}
 			]
 			}
