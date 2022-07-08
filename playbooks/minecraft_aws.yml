@@ -49,7 +49,7 @@
       file:
         path: "{{ item }}"
         state: directory
-        mode: '0744'
+        mode: '0755'
         owner: minecraft
         group: minecraft
       with_items:
