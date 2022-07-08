@@ -57,7 +57,7 @@
 
     - name: Create log stdout file
       ansible.builtin.file:
-        mode: '0744' 
+        mode: '0755' 
         path: "/var/log/minecraft/stdout.log"
         state: touch
         owner: minecraft
@@ -65,7 +65,7 @@
 
     - name: Create log stderr file
       ansible.builtin.file:
-        mode: '0744'
+        mode: '0755'
         path: "/var/log/minecraft/errors.log"
         state: touch
         owner: minecraft
