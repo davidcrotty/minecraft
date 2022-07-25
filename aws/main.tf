@@ -104,13 +104,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "example" {
   bucket = aws_s3_bucket.apps_bucket.id
 
   rule {
-    id     = "expire_after_7_days"
+    id     = "transition_to_archive"
     status = "Enabled"
 
-    # ... other transition/expiration actions ...
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
 
-    expiration {
-      days = 7
+    transition {
+      days          = 61
+      storage_class = "GLACIER_IR"
     }
   }
 }
