@@ -6,3 +6,4 @@
 *-init-*.yml
 *.swp
 *.tfvars
+*backend.conf
