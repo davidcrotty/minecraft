@@ -7,6 +7,14 @@ terraform {
   }
 
   required_version = ">= 1.2.0"
+
+  backend "s3" {
+    bucket = "minecraft-terraform-state-e0bb508b-580d-4d22-a454-aa5d6b6d49c6"
+    key    = "minecraft-infra/terraform.tfstate"
+    region = "eu-west-2"
+    access_key = var.awsaccesskey
+    secret_key = var.awsaccesssecret
+  }
 }
 
 provider "aws" {
