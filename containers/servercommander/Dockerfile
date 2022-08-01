@@ -14,7 +14,9 @@ WORKDIR /opt/infrastructure/aws/
 
 EXPOSE 8080/tcp
 
-ADD api/dist
-WORKDIR /var/www/servercommander
+COPY api/package*.json /var/www/servercommander
+WORKDIR /var/www/servercommander/
+RUN npm install
+ADD api/dist /var/www/servercommander/api/dist
 ENV PORT=8080
-CMD ["node", "index.js"]
+CMD ["node", "/var/www/servercommander/api/dist/index.js"]
