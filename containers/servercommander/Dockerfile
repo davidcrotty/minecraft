@@ -12,11 +12,7 @@ ENV TF_VAR_privatekeyLocation=/etc/infrastructure/minecraftserver.pem
 WORKDIR /opt/infrastructure/aws/
 # terraform init and run done on API endpoint hit launch
 
-EXPOSE 8080/tcp
-
 COPY api/package*.json /var/www/servercommander
 WORKDIR /var/www/servercommander/
 RUN npm install
 ADD api/dist /var/www/servercommander/api/dist
-ENV PORT=8080
-CMD ["node", "/var/www/servercommander/api/dist/index.js"]
