@@ -8,3 +8,4 @@
 *.tfvars
 *backend.conf
 *minecraftserver.pem
+*node_modules
