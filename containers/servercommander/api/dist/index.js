@@ -10,25 +10,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
+const child_process_1 = require("child_process");
 const handler = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(`Event: ${JSON.stringify(event, null, 2)}`);
-    console.log(`Context: ${JSON.stringify(context, null, 2)}`);
+    console.log("Running terraform plan");
+    (0, child_process_1.exec)(`ls -la`, (err, stdout, stderr) => {
+        if (err) {
+            throw err;
+        }
+        if (stderr) {
+            throw Error(`terraform error ${stderr}`);
+        }
+        console.log(stdout);
+    });
     return {
-        statusCode: 200,
+        statusCode: 201,
         body: JSON.stringify({
-            message: 'hello world',
+            message: 'server on',
         }),
     };
 });
 exports.handler = handler;
-
-exports.handler = async function(event, context) {
-    console.log(`Event: ${JSON.stringify(event, null, 2)}`);
-    console.log(`Context: ${JSON.stringify(context, null, 2)}`);
-    return {
-        statusCode: 200,
-        body: JSON.stringify({
-            message: 'hello world',
-        }),
-    };
-  }
