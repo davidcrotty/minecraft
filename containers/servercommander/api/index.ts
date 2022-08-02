@@ -1,14 +1,12 @@
-import { createLogger, transports, format } from "winston";
+import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
 
-const logger = createLogger({
-  transports: [new transports.Console()],
-  format: format.combine(
-    format.colorize(),
-    format.timestamp(),
-    format.printf(({ timestamp, level, message }) => {
-      return `[${timestamp}] ${level}: ${message}`;
-    })
-  ),
-});
-
-console.log("script has been invoked - turning on");
+export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
+  console.log(`Event: ${JSON.stringify(event, null, 2)}`);
+  console.log(`Context: ${JSON.stringify(context, null, 2)}`);
+  return {
+      statusCode: 200,
+      body: JSON.stringify({
+          message: 'hello world',
+      }),
+  };
+};
