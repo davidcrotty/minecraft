@@ -21,3 +21,14 @@ const handler = (event, context) => __awaiter(void 0, void 0, void 0, function* 
     };
 });
 exports.handler = handler;
+
+exports.handler = async function(event, context) {
+    console.log(`Event: ${JSON.stringify(event, null, 2)}`);
+    console.log(`Context: ${JSON.stringify(context, null, 2)}`);
+    return {
+        statusCode: 200,
+        body: JSON.stringify({
+            message: 'hello world',
+        }),
+    };
+  }

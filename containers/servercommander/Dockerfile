@@ -14,6 +14,6 @@ ENV TF_VAR_privatekeyLocation=/etc/infrastructure/minecraftserver.pem
 
 
 COPY api/package*.json /var/www/servercommander
-WORKDIR /var/www/servercommander/
+
+COPY api/dist/index.js api/package.json  ${LAMBDA_TASK_ROOT}
 RUN npm install
-ADD api/dist /var/www/servercommander/api/dist
