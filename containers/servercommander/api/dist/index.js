@@ -13,15 +13,16 @@ exports.handler = void 0;
 const child_process_1 = require("child_process");
 const handler = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Running terraform plan");
-    (0, child_process_1.exec)(`ls -la`, (err, stdout, stderr) => {
-        if (err) {
-            throw err;
-        }
-        if (stderr) {
-            throw Error(`terraform error ${stderr}`);
-        }
-        console.log(stdout);
-    });
+    let terraformInit = yield (0, child_process_1.exec)(`terraform init`);
+    if (terraformInit.stdout) {
+        console.log("success");
+    }
+    else if (terraformInit.stderr) {
+        console.log("error");
+    }
+    else {
+        console.log("init failed");
+    }
     return {
         statusCode: 201,
         body: JSON.stringify({
