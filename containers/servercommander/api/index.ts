@@ -13,7 +13,7 @@ export const handler = async (event: APIGatewayEvent, context: Context): Promise
     console.log(result);
 
     console.log("applying terraform config");
-    let terraformApply = await exec(`terraform apply -var-file="secret.tfvars" main.tf -auto-approve`);
+    let terraformApply = await exec(`terraform apply -auto-approve`);
 
     if(terraformApply.stdout) {
       console.log("terraform apply success");
