@@ -23,7 +23,7 @@ const handler = (event, context) => __awaiter(void 0, void 0, void 0, function* 
         let result = yield (0, stream_to_string_1.default)(terraformInit.stdout);
         console.log(result);
         console.log("applying terraform config");
-        let terraformApply = yield (0, child_process_1.exec)(`terraform apply -var-file="secret.tfvars" main.tf -auto-approve`);
+        let terraformApply = yield (0, child_process_1.exec)(`terraform apply -auto-approve`);
         if (terraformApply.stdout) {
             console.log("terraform apply success");
             let result = yield (0, stream_to_string_1.default)(terraformApply.stdout);
