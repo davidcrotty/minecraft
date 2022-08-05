@@ -16,7 +16,8 @@ const offSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function
     try {
         let terraformInit = yield readStream(`terraform init`);
         console.log(`terraformInit: ${terraformInit}`);
-        let terraformDestory = yield readStream(`terraform apply -destroy -auto-approve`);
+        let terraformDestroy = yield readStream(`terraform apply -destroy -auto-approve`);
+        console.log(`terraformDestroy: ${terraformDestroy}`);
     }
     catch (error) {
         console.log(`error: ${error}`);

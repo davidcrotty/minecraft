@@ -6,7 +6,8 @@ export const offSwitch = async (event: APIGatewayEvent, context: Context): Promi
   try {
     let terraformInit = await readStream(`terraform init`);
     console.log(`terraformInit: ${terraformInit}`);
-    let terraformDestory = await readStream(`terraform apply -destroy -auto-approve`);
+    let terraformDestroy = await readStream(`terraform apply -destroy -auto-approve`);
+    console.log(`terraformDestroy: ${terraformDestroy}`);
   } catch(error) {
     console.log(`error: ${error}`);
     return {
