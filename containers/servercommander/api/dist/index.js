@@ -15,7 +15,7 @@ const offSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function
     console.log("Running terraform destroy - turning off server");
     try {
         let terraformInit = yield readStream(`terraform init`);
-        console.log(`terraformInit: ${terraformInit}`);
+        console.log("terraformInit: " + terraformInit);
         let terraformDestroy = yield readStream(`terraform apply -destroy -auto-approve`);
         console.log(`terraformDestroy: ${terraformDestroy}`);
     }
@@ -64,7 +64,7 @@ const onSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function*
 exports.onSwitch = onSwitch;
 function readStream(command) {
     return new Promise((resolve, reject) => {
-        (0, child_process_1.exec)(command, (error, stdout, stderr) => {
+        (0, child_process_1.exec)(command, { maxBuffer: 1024 * 1024 * 25 }, (error, stdout, stderr) => {
             if (error) {
                 reject(error.name + error.message);
             }

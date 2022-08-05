@@ -5,7 +5,7 @@ export const offSwitch = async (event: APIGatewayEvent, context: Context): Promi
   console.log("Running terraform destroy - turning off server");
   try {
     let terraformInit = await readStream(`terraform init`);
-    console.log(`terraformInit: ${terraformInit}`);
+    console.log("terraformInit: " + terraformInit);
     let terraformDestroy = await readStream(`terraform apply -destroy -auto-approve`);
     console.log(`terraformDestroy: ${terraformDestroy}`);
   } catch(error) {
@@ -55,7 +55,7 @@ export const onSwitch = async (event: APIGatewayEvent, context: Context): Promis
 
 function readStream(command: string) : Promise<String> {
   return new Promise<String>((resolve, reject) => {
-      exec(command, (error, stdout, stderr) => {
+      exec(command, {maxBuffer: 1024 * 1024 * 25}, (error, stdout, stderr) => {
         if (error) {
           reject(error.name + error.message);
         } else if (stderr) {
