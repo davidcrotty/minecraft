@@ -8,36 +8,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handler = void 0;
+exports.onSwitch = exports.offSwitch = void 0;
 const child_process_1 = require("child_process");
-const stream_to_string_1 = __importDefault(require("stream-to-string"));
-const handler = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("Running terraform plan");
-    let terraformInit = yield (0, child_process_1.exec)(`terraform init`);
-    if (terraformInit.stdout) {
-        console.log("success");
-        let result = yield (0, stream_to_string_1.default)(terraformInit.stdout);
-        console.log(result);
-        console.log("applying terraform config");
-        let terraformApply = yield (0, child_process_1.exec)(`terraform apply -auto-approve`);
-        if (terraformApply.stdout) {
-            console.log("terraform apply success");
-            let result = yield (0, stream_to_string_1.default)(terraformApply.stdout);
-            console.log(result);
-        }
-        else if (terraformApply.stderr) {
-            console.log("terraform apply error");
-        }
+const offSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Running terraform destroy - turning off server");
+    try {
+        let terraformInit = yield readStream(`terraform init`);
+        console.log(`terraformInit: ${terraformInit}`);
+        let terraformDestory = yield readStream(`terraform apply -destroy -auto-approve`);
     }
-    else if (terraformInit.stderr) {
-        console.log("error");
+    catch (error) {
+        console.log(`error: ${error}`);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                message: 'server error',
+            }),
+        };
     }
-    else {
-        console.log("init failed");
+    return {
+        statusCode: 200,
+        body: JSON.stringify({
+            message: 'server off',
+        }),
+    };
+});
+exports.offSwitch = offSwitch;
+const onSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Running terraform plan - turning on server");
+    try {
+        let terraformInit = yield readStream(`terraform init`);
+        console.log(`terraformInit: ${terraformInit}`);
+        let terraformPlan = yield readStream(`terraform apply -auto-approve`);
+        console.log(`terraformPlan: ${terraformPlan}`);
+        // TODO query for ip here
+    }
+    catch (error) {
+        console.log(`error: ${error}`);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                message: 'server error',
+            }),
+        };
     }
     return {
         statusCode: 201,
@@ -46,4 +60,23 @@ const handler = (event, context) => __awaiter(void 0, void 0, void 0, function* 
         }),
     };
 });
-exports.handler = handler;
+exports.onSwitch = onSwitch;
+function readStream(command) {
+    return new Promise((resolve, reject) => {
+        (0, child_process_1.exec)(command, (error, stdout, stderr) => {
+            if (error) {
+                reject(error.name + error.message);
+            }
+            else if (stderr) {
+                // TODO scan for specific errors here
+                reject(stderr);
+            }
+            else if (stdout) {
+                resolve(stdout);
+            }
+            else {
+                reject("No output");
+            }
+        });
+    });
+}

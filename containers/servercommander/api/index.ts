@@ -1,32 +1,47 @@
 import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
 import { exec } from 'child_process';
-import streamToString from 'stream-to-string';
 
-export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
-  console.log("Running terraform plan");
+export const offSwitch = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
+  console.log("Running terraform destroy - turning off server");
+  try {
+    let terraformInit = await readStream(`terraform init`);
+    console.log(`terraformInit: ${terraformInit}`);
+    let terraformDestory = await readStream(`terraform apply -destroy -auto-approve`);
+  } catch(error) {
+    console.log(`error: ${error}`);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+          message: 'server error',
+      }),
+    };
+  }
   
-  let terraformInit = await exec(`terraform init`);
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+        message: 'server off',
+    }),
+};
+}
 
-  if (terraformInit.stdout) {
-    console.log("success");
-    let result = await streamToString(terraformInit.stdout);
-    console.log(result);
-
-    console.log("applying terraform config");
-    let terraformApply = await exec(`terraform apply -auto-approve`);
-
-    if(terraformApply.stdout) {
-      console.log("terraform apply success");
-      let result = await streamToString(terraformApply.stdout);
-      console.log(result);
-    } else if (terraformApply.stderr) {
-      console.log("terraform apply error");
-    }
-
-  } else if (terraformInit.stderr) {
-    console.log("error")
-  } else {
-    console.log("init failed")
+export const onSwitch = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
+  console.log("Running terraform plan - turning on server");
+  
+  try {
+    let terraformInit = await readStream(`terraform init`);
+    console.log(`terraformInit: ${terraformInit}`);
+    let terraformPlan = await readStream(`terraform apply -auto-approve`);
+    console.log(`terraformPlan: ${terraformPlan}`);
+    // TODO query for ip here
+  } catch(error) {
+    console.log(`error: ${error}`);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+          message: 'server error',
+      }),
+    };
   }
 
   return {
@@ -36,3 +51,20 @@ export const handler = async (event: APIGatewayEvent, context: Context): Promise
       }),
   };
 };
+
+function readStream(command: string) : Promise<String> {
+  return new Promise<String>((resolve, reject) => {
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          reject(error.name + error.message);
+        } else if (stderr) {
+          // TODO scan for specific errors here
+          reject(stderr);
+        } else if (stdout) {
+          resolve(stdout);
+        } else {
+          reject("No output");
+        }
+      })
+  });
+}
