@@ -4,6 +4,9 @@ RUN mkdir -p /opt/infrastructure
 RUN git clone https://github.com/davidcrotty/minecraft.git /opt/infrastructure
 
 FROM hashicorp/terraform:1.2.6 as terraform
+FROM ubuntu:bionic as ubuntu
+RUN apt-get update -y && apt-get install expect -y
+
 FROM public.ecr.aws/lambda/nodejs:16
 COPY --from=terraform /bin/terraform /bin/terraform
 
@@ -18,6 +21,7 @@ ENV TF_VAR_publickey="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCiwoNG9TpCYGowdld4T7
 
 COPY api/package*.json /var/www/servercommander
 
+COPY --from=ubuntu /usr/bin/unbuffer /bin/unbuffer
 COPY --from=git /opt/infrastructure/aws ${LAMBDA_TASK_ROOT}
 COPY api/dist/index.js api/package.json  ${LAMBDA_TASK_ROOT}
 RUN npm install

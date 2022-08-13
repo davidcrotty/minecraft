@@ -1,5 +1,5 @@
 import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 
 export const offSwitch = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
   console.log("Running terraform destroy - turning off server");
@@ -30,10 +30,7 @@ export const onSwitch = async (event: APIGatewayEvent, context: Context): Promis
   console.log("Running terraform plan - turning on server");
   
   try {
-    let terraformInit = await readStream(`terraform init`);
-    console.log(`terraformInit: ${terraformInit}`);
-    let terraformPlan = await readStream(`terraform apply -auto-approve`);
-    console.log(`terraformPlan: ${terraformPlan}`);
+    await readStream(`terraform init`);
     // TODO query for ip here
   } catch(error) {
     console.log(`error: ${error}`);
@@ -55,17 +52,18 @@ export const onSwitch = async (event: APIGatewayEvent, context: Context): Promis
 
 function readStream(command: string) : Promise<String> {
   return new Promise<String>((resolve, reject) => {
-      exec(command, {maxBuffer: 1024 * 1024 * 25}, (error, stdout, stderr) => {
-        if (error) {
-          reject(error.name + error.message);
-        } else if (stderr) {
-          // TODO scan for specific errors here
-          reject(stderr);
-        } else if (stdout) {
-          resolve(stdout);
-        } else {
-          reject("No output");
-        }
-      })
+      let process = spawn("unbuffer", ["terraform"]);
+      process.stdout.on('data', function (data) {
+        console.log('stdout: ' + data.toString());
+      });
+
+      process.stderr.on('data', function (data) {
+        console.log('stderr: ' + data.toString());
+      });
+
+      process.on('exit', function (code) {
+        console.log('child process exited with code ' + code?.toString());
+        resolve(code?.toString() || "-1");
+      });
   });
 }

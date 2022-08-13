@@ -39,10 +39,7 @@ exports.offSwitch = offSwitch;
 const onSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Running terraform plan - turning on server");
     try {
-        let terraformInit = yield readStream(`terraform init`);
-        console.log(`terraformInit: ${terraformInit}`);
-        let terraformPlan = yield readStream(`terraform apply -auto-approve`);
-        console.log(`terraformPlan: ${terraformPlan}`);
+        yield readStream(`terraform init`);
         // TODO query for ip here
     }
     catch (error) {
@@ -64,20 +61,16 @@ const onSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function*
 exports.onSwitch = onSwitch;
 function readStream(command) {
     return new Promise((resolve, reject) => {
-        (0, child_process_1.exec)(command, { maxBuffer: 1024 * 1024 * 25 }, (error, stdout, stderr) => {
-            if (error) {
-                reject(error.name + error.message);
-            }
-            else if (stderr) {
-                // TODO scan for specific errors here
-                reject(stderr);
-            }
-            else if (stdout) {
-                resolve(stdout);
-            }
-            else {
-                reject("No output");
-            }
+        let process = (0, child_process_1.spawn)("unbuffer", ["terraform"]);
+        process.stdout.on('data', function (data) {
+            console.log('stdout: ' + data.toString());
+        });
+        process.stderr.on('data', function (data) {
+            console.log('stderr: ' + data.toString());
+        });
+        process.on('exit', function (code) {
+            console.log('child process exited with code ' + (code === null || code === void 0 ? void 0 : code.toString()));
+            resolve((code === null || code === void 0 ? void 0 : code.toString()) || "-1");
         });
     });
 }
