@@ -130,7 +130,7 @@ resource "aws_spot_instance_request" "instance" {
   instance_type               = "m5.large"
   associate_public_ip_address = true
   key_name                    = "ssh-key"
-  spot_price                  = "0.033"
+  spot_price                  = "0.034"
   wait_for_fulfillment        = true
   iam_instance_profile        = aws_iam_instance_profile.web_instance_profile.id
 

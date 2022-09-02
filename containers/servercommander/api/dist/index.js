@@ -14,9 +14,9 @@ const child_process_1 = require("child_process");
 const offSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Running terraform destroy - turning off server");
     try {
-        let terraformInit = yield readStream(`terraform init`);
+        let terraformInit = yield runCommand(`terraform init`);
         console.log("terraformInit: " + terraformInit);
-        let terraformDestroy = yield readStream(`terraform apply -destroy -auto-approve`);
+        let terraformDestroy = yield runCommand(`terraform apply -destroy -auto-approve`);
         console.log(`terraformDestroy: ${terraformDestroy}`);
     }
     catch (error) {
@@ -39,8 +39,15 @@ exports.offSwitch = offSwitch;
 const onSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Running terraform plan - turning on server");
     try {
-        yield readStream(`terraform init`);
-        // TODO query for ip here
+        yield runCommand(`terraform init`);
+        yield runCommand(`terraform apply -auto-approve`);
+        let ipAddress = yield runCommand(`terraform output instance_ip`);
+        return {
+            statusCode: 201,
+            body: JSON.stringify({
+                ipAddress: `${ipAddress}`,
+            }),
+        };
     }
     catch (error) {
         console.log(`error: ${error}`);
@@ -51,26 +58,24 @@ const onSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function*
             }),
         };
     }
-    return {
-        statusCode: 201,
-        body: JSON.stringify({
-            message: 'server on',
-        }),
-    };
 });
 exports.onSwitch = onSwitch;
-function readStream(command) {
+// TODO enum or sealed class
+function runCommand(command) {
     return new Promise((resolve, reject) => {
-        let process = (0, child_process_1.spawn)("unbuffer", ["terraform"]);
-        process.stdout.on('data', function (data) {
-            console.log('stdout: ' + data.toString());
-        });
-        process.stderr.on('data', function (data) {
-            console.log('stderr: ' + data.toString());
-        });
-        process.on('exit', function (code) {
-            console.log('child process exited with code ' + (code === null || code === void 0 ? void 0 : code.toString()));
-            resolve((code === null || code === void 0 ? void 0 : code.toString()) || "-1");
+        (0, child_process_1.exec)(command, function (error, stdout, stderr) {
+            if (error) {
+                reject(error);
+            }
+            else if (stderr) {
+                reject(stderr);
+            }
+            else if (stdout) {
+                resolve(stdout);
+            }
+            else {
+                reject('No output');
+            }
         });
     });
 }

@@ -1,12 +1,14 @@
 import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
-import { spawn } from 'child_process';
+import { exec, ExecException } from 'child_process';
+
+type Command = 'terraform init' | 'terraform apply -destroy -auto-approve' | 'terraform apply -auto-approve' | 'terraform output instance_ip';
 
 export const offSwitch = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
   console.log("Running terraform destroy - turning off server");
   try {
-    let terraformInit = await readStream(`terraform init`);
+    let terraformInit = await runCommand(`terraform init`);
     console.log("terraformInit: " + terraformInit);
-    let terraformDestroy = await readStream(`terraform apply -destroy -auto-approve`);
+    let terraformDestroy = await runCommand(`terraform apply -destroy -auto-approve`);
     console.log(`terraformDestroy: ${terraformDestroy}`);
   } catch(error) {
     console.log(`error: ${error}`);
@@ -26,12 +28,20 @@ export const offSwitch = async (event: APIGatewayEvent, context: Context): Promi
 };
 }
 
+
 export const onSwitch = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
   console.log("Running terraform plan - turning on server");
   
   try {
-    await readStream(`terraform init`);
-    // TODO query for ip here
+    await runCommand(`terraform init`);
+    await runCommand(`terraform apply -auto-approve`);
+    let ipAddress = await runCommand(`terraform output instance_ip`);
+    return {
+      statusCode: 201,
+      body: JSON.stringify({
+          ipAddress: `${ipAddress}`,
+      }),
+  };
   } catch(error) {
     console.log(`error: ${error}`);
     return {
@@ -41,29 +51,21 @@ export const onSwitch = async (event: APIGatewayEvent, context: Context): Promis
       }),
     };
   }
-
-  return {
-      statusCode: 201,
-      body: JSON.stringify({
-          message: 'server on',
-      }),
-  };
 };
 
-function readStream(command: string) : Promise<String> {
+// TODO enum or sealed class
+function runCommand(command: Command) : Promise<String> {
   return new Promise<String>((resolve, reject) => {
-      let process = spawn("unbuffer", ["terraform"]);
-      process.stdout.on('data', function (data) {
-        console.log('stdout: ' + data.toString());
-      });
-
-      process.stderr.on('data', function (data) {
-        console.log('stderr: ' + data.toString());
-      });
-
-      process.on('exit', function (code) {
-        console.log('child process exited with code ' + code?.toString());
-        resolve(code?.toString() || "-1");
+      exec(command, function(error: ExecException | null, stdout: string, stderr: string) {
+        if (error) {
+          reject(error);
+        } else if(stderr) {
+          reject(stderr);
+        } else if (stdout) {
+          resolve(stdout);
+        } else {
+          reject('No output');
+        }
       });
   });
 }
