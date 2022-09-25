@@ -1,10 +1,5 @@
-FROM bitnami/git:2.37.1 as git
-# TODO no need to git infrastructure config
-RUN mkdir -p /opt/infrastructure
-
-RUN git clone https://github.com/davidcrotty/minecraft.git /opt/infrastructure
-
 FROM hashicorp/terraform:1.2.6 as terraform
+RUN mkdir -p /opt/infrastructure
 
 FROM public.ecr.aws/lambda/nodejs:16
 COPY --from=terraform /bin/terraform /bin/terraform
@@ -13,10 +8,10 @@ RUN mkdir -p /etc/infrastructure
 RUN mkdir -p /var/www/servercommander
 
 
-ADD minecraftserver.pem /etc/infrastructure/minecraftserver.pem 
+ADD containers/servercommander/minecraftserver.pem /etc/infrastructure/minecraftserver.pem 
 
-COPY api/package*.json /var/www/servercommander
+COPY containers/servercommander/api/package*.json /var/www/servercommander
 
-COPY --from=git /opt/infrastructure/aws ${LAMBDA_TASK_ROOT}
-COPY api/dist/index.js api/package.json  ${LAMBDA_TASK_ROOT}
+ADD aws ${LAMBDA_TASK_ROOT}
+COPY containers/servercommander/api/dist/index.js containers/servercommander/api/package.json  ${LAMBDA_TASK_ROOT}
 RUN npm install
