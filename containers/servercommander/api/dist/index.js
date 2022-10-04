@@ -14,9 +14,12 @@ const child_process_1 = require("child_process");
 const offSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Running terraform destroy - turning off server");
     try {
-        let terraformInit = yield runCommand(`terraform init`);
+        console.log(`Copying terraform files`);
+        yield runCommand(`cp -R . /tmp`);
+        console.log(`Copied terraform files`);
+        let terraformInit = yield runCommand(`terraform -chdir=/tmp/ init`);
         console.log("terraformInit: " + terraformInit);
-        let terraformDestroy = yield runCommand(`terraform apply -destroy -auto-approve`);
+        let terraformDestroy = yield runCommand(`terraform -chdir=/tmp/ apply -destroy -auto-approve`);
         console.log(`terraformDestroy: ${terraformDestroy}`);
     }
     catch (error) {
@@ -39,9 +42,15 @@ exports.offSwitch = offSwitch;
 const onSwitch = (event, context) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Running terraform plan - turning on server");
     try {
-        yield runCommand(`terraform init`);
-        yield runCommand(`terraform apply -auto-approve`);
-        let ipAddress = yield runCommand(`terraform output instance_ip`);
+        console.log(`Copying terraform files`);
+        yield runCommand(`cp -R . /tmp`);
+        console.log(`Copied terraform files`);
+        let initOutput = yield runCommand(`terraform -chdir=/tmp/ init`);
+        console.log(`Terraform init ran: ${initOutput}`);
+        let dirOutput = yield runCommand(`ls /tmp -la`);
+        console.log(`Dir list ran: ${dirOutput}`);
+        yield runCommand(`terraform -chdir=/tmp/ apply -auto-approve`);
+        let ipAddress = yield runCommand(`terraform -chdir=/tmp/ output instance_ip`);
         return {
             statusCode: 201,
             body: JSON.stringify({
@@ -74,7 +83,7 @@ function runCommand(command) {
                 resolve(stdout);
             }
             else {
-                reject('No output');
+                resolve('No output');
             }
         });
     });

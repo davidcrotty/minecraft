@@ -1,14 +1,17 @@
 import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
 import { exec, ExecException } from 'child_process';
 
-type Command = 'terraform init' | 'terraform apply -destroy -auto-approve' | 'terraform apply -auto-approve' | 'terraform output instance_ip';
+type Command = 'cp -R . /tmp' | 'ls /tmp -la' | 'terraform -chdir=/tmp/ init' | 'terraform -chdir=/tmp/ apply -destroy -auto-approve' | 'terraform -chdir=/tmp/ apply -auto-approve' | 'terraform -chdir=/tmp/ output instance_ip';
 
 export const offSwitch = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
   console.log("Running terraform destroy - turning off server");
   try {
-    let terraformInit = await runCommand(`terraform init`);
+    console.log(`Copying terraform files`);
+    await runCommand(`cp -R . /tmp`);
+    console.log(`Copied terraform files`);
+    let terraformInit = await runCommand(`terraform -chdir=/tmp/ init`);
     console.log("terraformInit: " + terraformInit);
-    let terraformDestroy = await runCommand(`terraform apply -destroy -auto-approve`);
+    let terraformDestroy = await runCommand(`terraform -chdir=/tmp/ apply -destroy -auto-approve`);
     console.log(`terraformDestroy: ${terraformDestroy}`);
   } catch(error) {
     console.log(`error: ${error}`);
@@ -31,11 +34,17 @@ export const offSwitch = async (event: APIGatewayEvent, context: Context): Promi
 
 export const onSwitch = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
   console.log("Running terraform plan - turning on server");
-  
+
   try {
-    await runCommand(`terraform init`);
-    await runCommand(`terraform apply -auto-approve`);
-    let ipAddress = await runCommand(`terraform output instance_ip`);
+    console.log(`Copying terraform files`);
+    await runCommand(`cp -R . /tmp`);
+    console.log(`Copied terraform files`);
+    let initOutput = await runCommand(`terraform -chdir=/tmp/ init`);
+    console.log(`Terraform init ran: ${initOutput}`);
+    let dirOutput = await runCommand(`ls /tmp -la`);
+    console.log(`Dir list ran: ${dirOutput}`);
+    await runCommand(`terraform -chdir=/tmp/ apply -auto-approve`);
+    let ipAddress = await runCommand(`terraform -chdir=/tmp/ output instance_ip`);
     return {
       statusCode: 201,
       body: JSON.stringify({
@@ -64,7 +73,7 @@ function runCommand(command: Command) : Promise<String> {
         } else if (stdout) {
           resolve(stdout);
         } else {
-          reject('No output');
+          resolve('No output');
         }
       });
   });

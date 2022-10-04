@@ -168,5 +168,3 @@ resource "aws_key_pair" "ssh-key" {
   key_name   = "ssh-key"
   public_key = var.publickey
 }
-
-# TODO factor in security group creation for ssh
