@@ -128,11 +128,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "example" {
 resource "aws_spot_instance_request" "instance" {
   ami                         = "ami-0fb391cce7a602d1f"
   instance_type               = "m5.large"
-  associate_public_ip_address = true
   key_name                    = "ssh-key"
   spot_price                  = "0.038"
   wait_for_fulfillment        = true
   iam_instance_profile        = aws_iam_instance_profile.web_instance_profile.id
+  subnet_id = "subnet-04a505e4e3064fe8d"
+  associate_public_ip_address = true
+  vpc_security_group_ids = ["${aws_security_group.webSG.id}"]
 
   tags = {
     Name = "minecraft"
@@ -157,6 +159,41 @@ resource "aws_spot_instance_request" "instance" {
     ]
   }
 
+}
+
+resource "aws_security_group" "webSG" {
+  name        = "webSG"
+  description = "Allow ssh  inbound traffic"
+  vpc_id      = "vpc-0e40d82e2978825a4"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 25565
+    to_port = 25565
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+
+  }
 }
 
 output "instance_ip" {
